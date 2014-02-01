@@ -77,5 +77,7 @@ Lots of things!
 
 And useful ideas:
 
+* If no command, assume command `status`
+* If no command but a `-t` option is given, assume command `trigger`
 * Check for default host in a `$HOME/.iftttest` file
 * "Pipe mode", where the only STDOUT output is response JSON
