@@ -21,8 +21,8 @@ iftttest localhost:8000 status
 Or to simulate a trigger check:
 
 ```bash
-iftttest localhost:
-
+iftttest localhost:8000 trigger -t my-trigger
+```
 
 ### Output
 
