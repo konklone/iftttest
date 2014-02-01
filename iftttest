@@ -1,0 +1,92 @@
+#!/usr/bin/env node
+
+/*
+  Test a channel by simulating the execution of triggers, status,
+  and other IFTTT API calls.
+*/
+
+var request = require('request');
+
+
+var Channel = {
+
+  // status endpoint
+  // https://ifttt.com/developers/docs/protocol_reference#channel-status
+  status: function(args) {
+    Channel.get("/ifttt/v1/status");
+  },
+
+  // check a trigger.
+  // required:
+  //   --trigger: trigger slug
+  // optional:
+  //   --limit: max number of items to be returned (num)
+  //   --before: return items before this time (string)
+  //   --after: return items after this time (string)
+  //   --triggerFields: trigger fields (object)
+  // https://ifttt.com/developers/docs/protocol_reference#triggers
+  trigger: function(args) {
+    if (!args.trigger) return console.log("Specify a --trigger.");
+
+    // TODO: limit, before, after, triggerFields
+    var body = {};
+
+    Channel.post("/ifttt/v1/triggers/" + args.trigger, body);
+  },
+
+
+  request: function(method, url, body) {
+    // default to http:// if no protocol given
+    var host = Channel.host;
+    if (Channel.host.search(/^https?:\/\//) < 0)
+      host = "http://" + host;
+    var url = host + url;
+
+    // always expect json in return
+    var options = {method: method, url: url, json: true};
+
+    console.log(method + ": " + url);
+
+    if (body) {
+      console.log("With: " + Channel.pp(body));
+      options.json = body;
+    }
+
+    request(options, function (error, response, body) {
+      if (error) return console.log("ERROR: " + error);
+
+      console.log("Status: " + response.statusCode);
+      if (body) console.log("\n" + Channel.pp(body));
+    });
+  },
+
+  get: function(url) {return Channel.request("GET", url)},
+  post: function(url, body) {return Channel.request("POST", url, body)},
+
+  pp: function(object) {return JSON.stringify(object, null, 4)},
+
+  host: null,
+};
+
+
+// tiny CLI
+
+var optimist = require('optimist');
+var args = optimist
+  .alias("trigger", "t")
+  .describe("trigger", "Trigger slug to be simulated.")
+  .usage("iftttest host command [options]\n\n" +
+      "host: e.g. localhost:8000\n" +
+      "commands: status, trigger")
+  .argv;
+
+if (args.help) {
+  console.log(optimist.help());
+  process.exit(0);
+}
+
+
+// ./iftttest [host] [command] OPTIONS
+Channel.host = args._[0];
+var command = args._[1];
+Channel[command](args);

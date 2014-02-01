@@ -1,0 +1,10 @@
+{
+    "name": "iftttest",
+    "description": "CLI client to simulate IFTTT Channel interaction.",
+    "version": "0.1.0",
+    "private": true,
+    "dependencies": {
+        "request": "*",
+        "optimist": "*"
+    }
+}
