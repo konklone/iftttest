@@ -28,13 +28,17 @@ var Channel = {
   trigger: function(args) {
     if (!args.trigger) return console.log("Specify a --trigger.");
 
-    // TODO: limit, before, after, triggerFields
     var body = {};
+    if (args.fields) body.triggerFields = args.fields;
+    if (args.limit) body.limit = args.limit;
+    if (args.before) body.before = Channel.time(args.before);
+    if (args.after) body.before = Channel.time(args.after);
 
     Channel.post("/ifttt/v1/triggers/" + args.trigger, body);
   },
 
 
+  // workhorse request method, output what is being done.
   request: function(method, url, body) {
     // default to http:// if no protocol given
     var host = Channel.host;
@@ -64,6 +68,13 @@ var Channel = {
   post: function(url, body) {return Channel.request("POST", url, body)},
 
   pp: function(object) {return JSON.stringify(object, null, 4)},
+  time: function(timestamp) {
+    // assume any epoch time passed in via CLI is in seconds
+    if (typeof(timestamp) == "number")
+      timestamp = timestamp * 1000;
+
+    return new Date(timestamp).getTime() / 1000;
+  },
 
   host: null,
 };
@@ -82,6 +93,12 @@ var args = optimist
 
 if (args.help) {
   console.log(optimist.help());
+  process.exit(0);
+}
+
+// --args: debug to understand how args get parsed
+if (args.args) {
+  console.log("args: " + Channel.pp(args));
   process.exit(0);
 }
 
