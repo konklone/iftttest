@@ -77,6 +77,7 @@ Lots of things!
 
 And useful ideas:
 
+* Allow validation of responses (e.g. complies with IFTTT API?)
 * If no command, assume command `status`
 * If no command but a `-t` option is given, assume command `trigger`
 * Check for default host in a `$HOME/.iftttest` file
