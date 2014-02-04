@@ -37,6 +37,29 @@ var Channel = {
     Channel.post("/ifttt/v1/triggers/" + args.trigger, body);
   },
 
+  // dynamic trigger field options.
+  // required:
+  //   --trigger: trigger slug
+  //   --field: field slug
+  // https://ifttt.com/developers/docs/protocol_reference#trigger-field-dynamic-options
+  trigger_options: function(args) {
+    if (!args.trigger) return console.log("Specify a --trigger.");
+    if (!args.field) return console.log("Specify a --field.");
+    Channel.post("/ifttt/v1/triggers/" + args.trigger + "/fields/" + args.field + "/options");
+  },
+
+  // dynamic trigger field options.
+  // required:
+  //   --trigger: trigger slug
+  //   --field: field slug
+  //   --value: field value
+  // https://ifttt.com/developers/docs/protocol_reference#trigger-field-dynamic-validation
+  trigger_validate: function(args) {
+    if (!args.trigger) return console.log("Specify a --trigger.");
+    if (!args.field) return console.log("Specify a --field.");
+    var body = {'value': args.value};
+    Channel.post("/ifttt/v1/triggers/" + args.trigger + "/fields/" + args.field + "/validate", body);
+  },
 
   // workhorse request method, output what is being done.
   request: function(method, url, body) {
@@ -84,11 +107,13 @@ var Channel = {
 
 var optimist = require('optimist');
 var args = optimist
+  .alias("field", "f")
   .alias("trigger", "t")
+  .describe("field", "Field slug to be simulated.")
   .describe("trigger", "Trigger slug to be simulated.")
   .usage("iftttest host command [options]\n\n" +
       "host: e.g. localhost:8000\n" +
-      "commands: status, trigger")
+      "commands: status, trigger, trigger_options, trigger_validate")
   .argv;
 
 if (args.help) {
