@@ -7,7 +7,7 @@ Not publicly distributed through npm at this time.
 ### Usage
 
 ```bash
-iftttest HOST COMMAND [OPTIONS]
+iftttest [HOST] COMMAND [OPTIONS]
 ```
 
 Where `HOST` is the base hostname of the channel, e.g. `localhost:8000`. If no protocol is given, `http://` is assumed.
@@ -22,6 +22,18 @@ Or to simulate a trigger check:
 
 ```bash
 iftttest localhost:8000 trigger -t my-trigger
+```
+
+Set a default HOST value (saves to JSON at `$HOME/.iftttest`) with:
+
+```bash
+iftttest set host localhost:8000
+```
+
+And then you can run commands without a HOST:
+
+```bash
+iftttest status
 ```
 
 ### Output
@@ -78,7 +90,4 @@ Lots of things!
 And useful ideas:
 
 * Allow validation of responses (e.g. complies with IFTTT API?)
-* If no command, assume command `status`
-* If no command but a `-t` option is given, assume command `trigger`
-* Check for default host in a `$HOME/.iftttest` file
 * "Pipe mode", where the only STDOUT output is response JSON

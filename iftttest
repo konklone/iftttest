@@ -127,7 +127,7 @@ var Channel = {
       fs.writeFileSync(Channel.config.filename, data);
     },
 
-    filename: process.env.HOME + "/.ifttt"
+    filename: process.env.HOME + "/.iftttest"
   }
 };
 
@@ -135,7 +135,7 @@ var Channel = {
 /******* tiny CLI *****/
 
 
-// $HOME/.ifttt is an optional JSON config file for default parameters.
+// $HOME/.iftttest is an optional JSON config file for default parameters.
 //
 // supported parameters: host
 
@@ -166,7 +166,7 @@ if (args.args) {
   process.exit(0);
 }
 
-// special command: `set` will set a value in $HOME/.ifttt
+// special command: `set` will set a value in $HOME/.iftttest
 if (args._[0] == "set") {
   var key = args._[1];
   var value = args._[2];
