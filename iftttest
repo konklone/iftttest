@@ -191,7 +191,14 @@ if (args._[0] == "set") {
   process.exit(0);
 }
 
+// special command: `config` will print out the current config
+if (args._[0] == "config") {
+  console.log(JSON.stringify(Channel.config.get(), null, 2));
+  process.exit(0);
+}
 
+
+// default: an IFTTT command
 var command = args._[0];
 if (!command) {
   console.log(optimist.help());

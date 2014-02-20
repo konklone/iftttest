@@ -22,6 +22,12 @@ To set a client `secret` (optional):
 iftttest set secret my-special-client-secret
 ```
 
+Print the current channel options to the console with the `config` command:
+
+```bash
+iftttest config
+```
+
 ### Usage
 
 ```bash
