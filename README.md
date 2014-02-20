@@ -100,5 +100,4 @@ And useful ideas:
 
 * Allow validation of responses (e.g. complies with IFTTT API?)
 * "Pipe mode", where the only STDOUT output is response JSON
-* `config` command to show current config
 * help command per-command, to show options for `trigger`, etc.
