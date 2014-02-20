@@ -73,8 +73,8 @@ var Channel = {
   // workhorse request method, output what is being done.
   request: function(method, url, body) {
     // default to http:// if no protocol given
-    var host = Channel.host;
-    if (Channel.host.search(/^https?:\/\//) < 0)
+    var host = Channel.config.host;
+    if (Channel.config.host.search(/^https?:\/\//) < 0)
       host = "http://" + host;
     var url = host + url;
 
@@ -108,9 +108,14 @@ var Channel = {
     return new Date(timestamp).getTime() / 1000;
   },
 
-  host: null,
+
+  /**** config for the channel ******/
 
   config: {
+
+    host: null,
+    secret: null,
+
     // get the whole config file
     get: function() {
       if (fs.existsSync(Channel.config.filename))
@@ -127,6 +132,13 @@ var Channel = {
       fs.writeFileSync(Channel.config.filename, data);
     },
 
+    // destructive, does a get() and then merges it with Channel.config
+    load: function() {
+      var config = Channel.config.get();
+      for (var key in config)
+        Channel.config[key] = config[key];
+    },
+
     filename: process.env.HOME + "/.iftttest"
   }
 };
@@ -134,25 +146,20 @@ var Channel = {
 
 /******* tiny CLI *****/
 
-
-// $HOME/.iftttest is an optional JSON config file for default parameters.
-//
-// supported parameters: host
-
-var config = Channel.config.get();
-
-
 var optimist = require('optimist');
 var args = optimist
   .alias("field", "f")
   .alias("trigger", "t")
+  .alias("help", "h")
+  .describe("help", "See this message.")
   .describe("field", "Field slug to be simulated.")
   .describe("trigger", "Trigger slug to be simulated.")
-  .usage("iftttest [HOST] COMMAND [options]\n\n" +
-      "HOST is the base hostname of the channel.\n\n" +
+  .usage("iftttest COMMAND [options]\n\n" +
       "COMMAND is one of:\n  status, trigger, trigger_options, trigger_validate\n\n" +
-      "You can omit HOST by setting a default:\n" +
-      "  iftttest set host [host]")
+      "Set channel parameters with:\n" +
+      "  iftttest set [key] [value]\n\n" +
+      "You need to set a `host` before running other commands, e.g.:\n" +
+      "  iftttest set host localhost:8000")
   .argv;
 
 if (args.help) {
@@ -178,15 +185,27 @@ if (args._[0] == "set") {
 }
 
 
-// interpret as HOST COMMAND if no host set, COMMAND otherwise
-var host = config.host || args._.shift();
-var command = args._.shift();
-
-if (!host || !command) {
+var command = args._[0];
+if (!command) {
   console.log(optimist.help());
   process.exit(1);
 }
 
 
-Channel.host = host;
+/**** tiny config ****/
+
+// $HOME/.iftttest is an optional JSON config file for default parameters.
+//
+// supported parameters:
+//   host: base hostname
+//   secret: client secret
+
+Channel.config.load();
+if (!Channel.config.host) {
+  console.log("Set a base hostname first, with: iftttest set host [hostname]");
+  process.exit(1);
+}
+
+
+// go!
 Channel[command](args);

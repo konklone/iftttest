@@ -4,43 +4,47 @@ CLI client to simulate IFTTT Channel interaction.
 
 Not publicly distributed through npm at this time.
 
-### Usage
+### Configure your channel
 
-```bash
-iftttest [HOST] COMMAND [OPTIONS]
-```
+Set channel options with the `set` command.
 
-Where `HOST` is the base hostname of the channel, e.g. `localhost:8000`. If no protocol is given, `http://` is assumed.
+Setting the `host` is required before running other commands. If no protocol is given, `http://` is assumed.
 
-To run a status check against a channel running at `localhost:8000`:
-
-```bash
-iftttest localhost:8000 status
-```
-
-Or to simulate a trigger check:
-
-```bash
-iftttest localhost:8000 trigger -t my-trigger
-```
-
-Set a default HOST value (saves to JSON at `$HOME/.iftttest`) with:
+To set the `host`:
 
 ```bash
 iftttest set host localhost:8000
 ```
 
-And then you can run commands without a HOST:
+To set a client `secret` (optional):
+
+```bash
+iftttest set secret my-special-client-secret
+```
+
+### Usage
+
+```bash
+iftttest COMMAND [OPTIONS]
+```
+
+To run a status check against a channel:
 
 ```bash
 iftttest status
+```
+
+Or to simulate a trigger check:
+
+```bash
+iftttest trigger -t my-trigger
 ```
 
 ### Output
 
 You'll see the request's HTTP method, the URL, and any submitted JSON body. Then, the response's status code, and body.
 
-Running `iftttest localhost:8000 status` would get you output like:
+Running `iftttest status` would get you output like:
 
 ```
 GET: http://localhost:8000/ifttt/v1/status
@@ -55,7 +59,7 @@ Status: 200
 }
 ```
 
-Running `iftttest localhost:8000 trigger -t new-terrific-updates` would you get output like:
+Running `iftttest trigger -t new-terrific-updates` would you get output like:
 
 ```
 POST: http://localhost:8000/ifttt/v1/triggers/new-terrific-updates
@@ -79,15 +83,16 @@ Status: 200
 
 Lots of things!
 
-* User authentication
-* User information
-* Shared secrets
 * Trigger fields
 * Dynamic trigger options
 * Dynamic trigger validation
+* User authentication
+* User information
 * Channel actions
 
 And useful ideas:
 
 * Allow validation of responses (e.g. complies with IFTTT API?)
 * "Pipe mode", where the only STDOUT output is response JSON
+* `config` command to show current config
+* help command per-command, to show options for `trigger`, etc.
