@@ -5,10 +5,14 @@
   and other IFTTT API calls.
 */
 
-var request = require('request');
+var fs = require("fs"),
+    request = require('request');
 
 
 var Channel = {
+
+
+  /******* test methods *****/
 
   // status endpoint
   // https://ifttt.com/developers/docs/protocol_reference#channel-status
@@ -45,6 +49,7 @@ var Channel = {
   trigger_options: function(args) {
     if (!args.trigger) return console.log("Specify a --trigger.");
     if (!args.field) return console.log("Specify a --field.");
+
     Channel.post("/ifttt/v1/triggers/" + args.trigger + "/fields/" + args.field + "/options");
   },
 
@@ -57,9 +62,13 @@ var Channel = {
   trigger_validate: function(args) {
     if (!args.trigger) return console.log("Specify a --trigger.");
     if (!args.field) return console.log("Specify a --field.");
-    var body = {'value': args.value};
+
+    var body = {value: args.value};
     Channel.post("/ifttt/v1/triggers/" + args.trigger + "/fields/" + args.field + "/validate", body);
   },
+
+
+  /******* utility methods, used by tests *****/
 
   // workhorse request method, output what is being done.
   request: function(method, url, body) {
@@ -100,10 +109,38 @@ var Channel = {
   },
 
   host: null,
+
+  config: {
+    // get the whole config file
+    get: function() {
+      if (fs.existsSync(Channel.config.filename))
+        return JSON.parse(fs.readFileSync(Channel.config.filename));
+      else
+        return {};
+    },
+
+    set: function(key, value) {
+      var config = Channel.config.get();
+      config[key] = value;
+
+      var data = JSON.stringify(config, null, 2) + "\n";
+      fs.writeFileSync(Channel.config.filename, data);
+    },
+
+    filename: process.env.HOME + "/.ifttt"
+  }
 };
 
 
-// tiny CLI
+/******* tiny CLI *****/
+
+
+// $HOME/.ifttt is an optional JSON config file for default parameters.
+//
+// supported parameters: host
+
+var config = Channel.config.get();
+
 
 var optimist = require('optimist');
 var args = optimist
@@ -111,9 +148,11 @@ var args = optimist
   .alias("trigger", "t")
   .describe("field", "Field slug to be simulated.")
   .describe("trigger", "Trigger slug to be simulated.")
-  .usage("iftttest host command [options]\n\n" +
-      "host: e.g. localhost:8000\n" +
-      "commands: status, trigger, trigger_options, trigger_validate")
+  .usage("iftttest [HOST] COMMAND [options]\n\n" +
+      "HOST is the base hostname of the channel.\n\n" +
+      "COMMAND is one of:\n  status, trigger, trigger_options, trigger_validate\n\n" +
+      "You can omit HOST by setting a default:\n" +
+      "  iftttest set host [host]")
   .argv;
 
 if (args.help) {
@@ -127,8 +166,27 @@ if (args.args) {
   process.exit(0);
 }
 
+// special command: `set` will set a value in $HOME/.ifttt
+if (args._[0] == "set") {
+  var key = args._[1];
+  var value = args._[2];
 
-// ./iftttest [host] [command] OPTIONS
-Channel.host = args._[0];
-var command = args._[1];
+  console.log("Setting `" + key + "` to `" + value + "`");
+  Channel.config.set(key, value);
+
+  process.exit(0);
+}
+
+
+// interpret as HOST COMMAND if no host set, COMMAND otherwise
+var host = config.host || args._.shift();
+var command = args._.shift();
+
+if (!host || !command) {
+  console.log(optimist.help());
+  process.exit(1);
+}
+
+
+Channel.host = host;
 Channel[command](args);
