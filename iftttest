@@ -79,9 +79,16 @@ var Channel = {
     var url = host + url;
 
     // always expect json in return
-    var options = {method: method, url: url, json: true};
+    var options = {method: method, url: url, json: true, headers: {}};
 
     console.log(method + ": " + url);
+
+    // if set, client secret will always be sent
+    if (Channel.config.secret) {
+      var auth = "Bearer " + Channel.config.secret;
+      console.log("Authorization: " + auth)
+      options.headers["Authorization"] = auth;
+    }
 
     if (body) {
       console.log("With: " + Channel.pp(body));
