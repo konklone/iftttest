@@ -36,7 +36,7 @@ var Channel = {
     if (args.fields) body.triggerFields = args.fields;
     if (args.limit) body.limit = args.limit;
     if (args.before) body.before = Channel.time(args.before);
-    if (args.after) body.before = Channel.time(args.after);
+    if (args.after) body.after = Channel.time(args.after);
 
     Channel.post("/ifttt/v1/triggers/" + args.trigger, body);
   },
