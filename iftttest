@@ -85,9 +85,9 @@ var Channel = {
 
     // if set, client secret will always be sent
     if (Channel.config.secret) {
-      var auth = "Bearer " + Channel.config.secret;
-      console.log("Authorization: " + auth)
-      options.headers["Authorization"] = auth;
+      var auth = Channel.config.secret;
+      console.log("IFTTT-Channel-Key: " + auth)
+      options.headers["IFTTT-Channel-Key"] = auth;
     }
 
     if (body) {
