@@ -20,6 +20,12 @@ var Channel = {
     Channel.get("/ifttt/v1/status");
   },
 
+  // test setup endpoint
+  // https://ifttt.com/developers/docs/testing#the-testsetup-endpoint
+  test_setup: function(args) {
+    Channel.post("/ifttt/v1/test/setup");
+  },
+
   // check a trigger.
   // required:
   //   --trigger: trigger slug
@@ -162,7 +168,7 @@ var args = optimist
   .describe("field", "Field slug to be simulated.")
   .describe("trigger", "Trigger slug to be simulated.")
   .usage("iftttest COMMAND [options]\n\n" +
-      "COMMAND is one of:\n  status, trigger, trigger_options, trigger_validate\n\n" +
+      "COMMAND is one of:\n  status, test_setup, trigger, trigger_options, trigger_validate\n\n" +
       "Set channel parameters with:\n" +
       "  iftttest set [key] [value]\n\n" +
       "You need to set a `host` before running other commands, e.g.:\n" +
